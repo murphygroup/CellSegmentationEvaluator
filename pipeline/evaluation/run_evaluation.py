@@ -1,13 +1,6 @@
-import importlib.resources
 import pickle
-import re
-# from math import prod
-from pathlib import Path
-from typing import Any, Dict, List, Tuple
-import xmltodict
 import numpy as np
 from PIL import Image
-from pint import Quantity, UnitRegistry
 from scipy.sparse import csr_matrix
 from scipy.stats import variation
 from skimage.filters import threshold_mean
@@ -23,6 +16,8 @@ from os.path import join
 import glob
 import os
 import json
+from skimage.segmentation import find_boundaries
+
 
 """
 Package functions that evaluate a single segmentation method
@@ -304,31 +299,121 @@ def get_quality_score(features, model):
 	)
 	return score
 
+def get_indexed_mask(mask, boundary):
+	boundary = boundary * 1
+	boundary_loc = np.where(boundary == 1)
+	boundary[boundary_loc] = mask[boundary_loc]
+	return boundary
 
-def get_evaluation(img_dir, mask_dir) -> Dict[str, Any]:
-	print('Calculating single-method metrics...')
+def get_boundary(mask):
+	mask_boundary = find_boundaries(mask, mode='inner')
+	mask_boundary_indexed = get_indexed_mask(mask, mask_boundary)
+	return mask_boundary_indexed
+
+def get_matched_cells(cell_arr, cell_membrane_arr, nuclear_arr, mismatch_repair):
+	a = set((tuple(i) for i in cell_arr))
+	b = set((tuple(i) for i in cell_membrane_arr))
+	c = set((tuple(i) for i in nuclear_arr))
+	d = a - b
+	mismatch_pixel_num = len(list(c - d))
+	mismatch_fraction = len(list(c - d)) / len(list(c))
+	if not mismatch_repair:
+		if mismatch_pixel_num == 0:
+			return np.array(list(a)), np.array(list(c)), 0
+		else:
+			return False, False, False
+	else:
+		if mismatch_pixel_num < len(c):
+			return np.array(list(a)), np.array(list(d & c)), mismatch_fraction
+		else:
+			return False, False, False
+
+def get_mask(cell_list, mask_shape):
+	mask = np.zeros(mask_shape)
+	for cell_num in range(len(cell_list)):
+		mask[tuple(cell_list[cell_num].T)] = cell_num
+	return mask
+
+
+def get_matched_masks(cell_mask, nuclear_mask):
+	cell_membrane_mask = get_boundary(cell_mask)
+	cell_coords = get_indices_sparse(cell_mask)[1:]
+	nucleus_coords = get_indices_sparse(nuclear_mask)[1:]
+	cell_membrane_coords = get_indices_sparse(cell_membrane_mask)[1:]
+	cell_coords = list(map(lambda x: np.array(x).T, cell_coords))
+	cell_membrane_coords = list(map(lambda x: np.array(x).T, cell_membrane_coords))
+	nucleus_coords = list(map(lambda x: np.array(x).T, nucleus_coords))
+	cell_matched_index_list = []
+	nucleus_matched_index_list = []
+	cell_matched_list = []
+	nucleus_matched_list = []
 	
+	repaired_num = 0
+	for i in range(len(cell_coords)):
+		if len(cell_coords[i]) != 0:
+			current_cell_coords = cell_coords[i]
+			nuclear_search_num = np.unique(list(map(lambda x: nuclear_mask[tuple(x)], current_cell_coords)))
+			best_mismatch_fraction = 1
+			whole_cell_best = []
+			for j in nuclear_search_num:
+				# print(j)
+				if j != 0:
+					if (j-1 not in nucleus_matched_index_list) and (i not in cell_matched_index_list):
+						whole_cell, nucleus, mismatch_fraction = get_matched_cells(cell_coords[i], cell_membrane_coords[i], nucleus_coords[j-1], mismatch_repair=1)
+						if type(whole_cell) != bool:
+							if mismatch_fraction < best_mismatch_fraction:
+								best_mismatch_fraction = mismatch_fraction
+								whole_cell_best = whole_cell
+								nucleus_best = nucleus
+								i_ind = i
+								j_ind = j-1
+			if best_mismatch_fraction < 1 and best_mismatch_fraction > 0:
+				repaired_num += 1
+			
+			if len(whole_cell_best) > 0:
+				cell_matched_list.append(whole_cell_best)
+				nucleus_matched_list.append(nucleus_best)
+				cell_matched_index_list.append(i_ind)
+				nucleus_matched_index_list.append(j_ind)
+	cell_matched_mask = get_mask(cell_matched_list, cell_mask.shape)
+	nuclear_matched_mask = get_mask(nucleus_matched_list, nuclear_mask.shape)
+	cell_outside_nucleus_mask = cell_matched_mask - nuclear_matched_mask
+	return cell_matched_mask, nuclear_matched_mask, cell_outside_nucleus_mask
+	
+def get_evaluation(img_dir, mask_dir, segmentation):
+	print('Calculating single-method metrics...')
 	# get compartment masks
-	dir = bz2.BZ2File(mask_dir[0], 'rb')
-	cell_matched_mask = pickle.load(dir)
-	dir = bz2.BZ2File(mask_dir[1], 'rb')
-	nuclear_matched_mask = pickle.load(dir)
-	dir = bz2.BZ2File(mask_dir[2], 'rb')
-	cell_outside_nucleus_mask = pickle.load(dir)
+	if len(mask_dir) == 4:
+		dir = bz2.BZ2File(mask_dir[1], 'rb')
+		cell_matched_mask = pickle.load(dir)
+		dir = bz2.BZ2File(mask_dir[2], 'rb')
+		nuclear_matched_mask = pickle.load(dir)
+		dir = bz2.BZ2File(mask_dir[3], 'rb')
+		cell_outside_nucleus_mask = pickle.load(dir)
+		dir = bz2.BZ2File(mask_dir[0], 'rb')
+		original_mask = pickle.load(dir)
+	elif len(mask_dir) == 1:
+		original_mask_stack = imread(mask_dir[0])
+		cell_mask = original_mask_stack[0]
+		nuclear_mask = original_mask_stack[1]
+		cell_matched_mask, nuclear_matched_mask, cell_outside_nucleus_mask = get_matched_masks(cell_mask, nuclear_mask)
+		
 	metric_mask = np.dstack((cell_matched_mask, nuclear_matched_mask, cell_outside_nucleus_mask)).astype(int)
 	metric_mask = np.moveaxis(metric_mask, -1, 0)
-	nucleus = imread(join(img_dir, 'nucleus.tif'))
-	cytoplasm = imread(join(img_dir, 'cytoplasm.tif'))
-	membrane = imread(join(img_dir, 'membrane.tif'))
-	img = np.dstack((nucleus, cytoplasm, membrane))
-	img = np.moveaxis(img, -1, 0)
+	if segmentation == 1:
+		nucleus = imread(join(img_dir, 'nucleus.tif'))
+		cytoplasm = imread(join(img_dir, 'cytoplasm.tif'))
+		membrane = imread(join(img_dir, 'membrane.tif'))
+		img = np.dstack((nucleus, cytoplasm, membrane))
+		img = np.moveaxis(img, -1, 0)
+	else:
+		img = imread(glob.glob(join(img_dir, '*.tif*'))[0])
+
 	# separate image foreground background
 	if not os.path.exists(join(img_dir, 'img_binary.pickle')):
-		img_thresholded = sum(
-			thresholding(img[c])
-			for c in range(3)
-		)
-		img_thresholded = np.sign(img_thresholded).astype(int)
+		img_thresholded = sum(thresholding(img[c]) for c in range(img.shape[0]))
+		if segmentation == 0:
+			img_thresholded[img_thresholded <= round(img.shape[0] * 0.2)] = 0
 		img_binary = foreground_separation(img_thresholded)
 		img_binary = np.sign(img_binary)
 		fg_bg_image = Image.fromarray(img_binary.astype(np.uint8) * 255, mode="L").convert("1")
@@ -344,14 +429,21 @@ def get_evaluation(img_dir, mask_dir) -> Dict[str, Any]:
 		"Cell Not Including Nucleus (cell membrane plus cytoplasm)",
 	]
 	metrics = {}
-	img_channels = get_image_channels(img_dir)
+	if segmentation == 1:
+		img_channels = get_image_channels(img_dir)
+	else:
+		img_channels = img
 	for channel in range(metric_mask.shape[0]):
-		current_mask = metric_mask[channel]
+		current_mask = metric_mask[channel].astype(int)
 		mask_binary = np.sign(current_mask)
 		metrics[channel_names[channel]] = {}
 		if channel_names[channel] == "Matched Cell":
-			original_mask = mask_dir[3]
-			matched_fraction = get_matched_fraction(os.path.basename(os.path.dirname(mask_dir[0])), original_mask, cell_matched_mask, nuclear_matched_mask)
+			if segmentation == 1:
+				repair = os.path.basename(os.path.dirname(mask_dir[0]))
+				matched_fraction = get_matched_fraction(repair, original_mask, cell_matched_mask, nuclear_matched_mask)
+			else:
+				repair = 'nonrepaired_matched_mask'
+				matched_fraction = get_matched_fraction(repair, cell_mask, cell_matched_mask, nuclear_matched_mask)
 			
 
 			if img_dir.find('CODEX') != -1:
@@ -370,7 +462,6 @@ def get_evaluation(img_dir, mask_dir) -> Dict[str, Any]:
 			cell_num_normalized = cell_num / micron_num * 100
 			
 			# calculate the standard deviation of cell size
-			
 			cell_size_std = cell_size_uniformity(current_mask)
 			
 			# get coverage metrics
@@ -434,13 +525,21 @@ def get_evaluation(img_dir, mask_dir) -> Dict[str, Any]:
 	
 	return metrics
 
-def evaluation(img_dir, mask_dir):
-	original_masks = sorted(glob.glob(join(os.path.dirname(mask_dir), 'mask*.pickle')))
-	cell_matched_masks = sorted(glob.glob(join(mask_dir, 'cell_matched_mask*.pickle')))
-	nuclear_matched_mask = sorted(glob.glob(join(mask_dir, 'nuclear_matched_mask*.pickle')))
-	cell_outside_nucleus_matched_mask = sorted(glob.glob(join(mask_dir, 'cell_outside_nucleus_matched_mask*.pickle')))
-	for i in range(len(cell_matched_masks)):
-		metrics = get_evaluation(img_dir, [cell_matched_masks[i], nuclear_matched_mask[i], cell_outside_nucleus_matched_mask[i], original_masks[i]])
-		# save QC json file
-		with open(join(mask_dir, 'metrics_' + os.path.basename(original_masks[i])[5:-7] + '.json'), 'w') as f:
-			json.dump(metrics, f)
+def evaluation(img_dir, mask_dir, segmentation):
+	if segmentation == 1:
+		original_masks = sorted(glob.glob(join(os.path.dirname(mask_dir), 'mask*.pickle')))
+		cell_matched_masks = sorted(glob.glob(join(mask_dir, 'cell_matched_mask*.pickle')))
+		nuclear_matched_mask = sorted(glob.glob(join(mask_dir, 'nuclear_matched_mask*.pickle')))
+		cell_outside_nucleus_matched_mask = sorted(glob.glob(join(mask_dir, 'cell_outside_nucleus_matched_mask*.pickle')))
+		for i in range(len(cell_matched_masks)):
+			metrics = get_evaluation(img_dir, [original_masks[i], cell_matched_masks[i], nuclear_matched_mask[i], cell_outside_nucleus_matched_mask[i]], segmentation)
+			# save QC json file
+			with open(join(mask_dir, 'metrics_' + os.path.basename(original_masks[i]) + '.json'), 'w') as f:
+				json.dump(metrics, f)
+	else:
+		original_masks = glob.glob(join(mask_dir, '**', '*.tif*'), recursive=True)
+		for i in range(len(original_masks)):
+			metrics = get_evaluation(img_dir, [original_masks[i]], segmentation)
+			# save QC json file
+			with open(join(mask_dir, 'metrics_' + os.path.basename(original_masks[i]) + '.json'), 'w') as f:
+				json.dump(metrics, f)

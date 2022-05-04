@@ -36,7 +36,7 @@ if __name__ == '__main__':
 				elif noise_kind == 'downsampling':
 					config['noise'] = 'downsampling'
 			elif noise == 'n':
-				config['noise'] == None
+				config['noise'] = None
 		elif download == '2':
 			mask_path = input('Enter the absolute path you would like to download the segmentation masks to:\n')
 			get_segmentation_masks(mask_path)
@@ -45,6 +45,7 @@ if __name__ == '__main__':
 	elif package_utilization == '2':
 		config['HuBMAP_data'] = 0
 		config['segmentation'] = 1
+		config['noise'] = None
 		config['input_channel_indices'] = {}
 		value = input('Please provide the c-axis index of nuclear channel for segmentation\n')
 		config['input_channel_indices']['nucleus'] = value
@@ -59,9 +60,10 @@ if __name__ == '__main__':
 		config['HuBMAP_data'] = 0
 		config['segmentation'] = 0
 		config['evaluation'] = 1
-		img_path = input('Enter the absolute path of your image:\n')
+		config['noise'] = None
+		img_path = input('Enter the absolute path of your image folder (image has to be TIF or OME-TIFF format):\n')
 		config['img_dir'] = img_path
-		mask_path = input('Enter the absolute path of your segmentation mask:\n')
+		mask_path = input('Enter the absolute path of your segmentation masks folder (masks have to be TIF or OME-TIFF format):\n')
 		config['mask_dir'] = mask_path
 	with open("config.json", "w") as f:
 		json.dump(config, f)

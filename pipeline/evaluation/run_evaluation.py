@@ -534,12 +534,12 @@ def evaluation(img_dir, mask_dir, segmentation):
 		for i in range(len(cell_matched_masks)):
 			metrics = get_evaluation(img_dir, [original_masks[i], cell_matched_masks[i], nuclear_matched_mask[i], cell_outside_nucleus_matched_mask[i]], segmentation)
 			# save QC json file
-			with open(join(mask_dir, 'metrics_' + os.path.basename(original_masks[i]) + '.json'), 'w') as f:
+			with open(join(mask_dir, 'metrics_' + os.path.basename(original_masks[i]) + '.json'), 'wb') as f:
 				json.dump(metrics, f)
 	else:
 		original_masks = glob.glob(join(mask_dir, '**', '*.tif*'), recursive=True)
 		for i in range(len(original_masks)):
 			metrics = get_evaluation(img_dir, [original_masks[i]], segmentation)
 			# save QC json file
-			with open(join(mask_dir, 'metrics_' + os.path.basename(original_masks[i]) + '.json'), 'w') as f:
+			with open(join(mask_dir, 'metrics_' + os.path.basename(original_masks[i]) + '.json'), 'wb') as f:
 				json.dump(metrics, f)

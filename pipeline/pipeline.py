@@ -9,6 +9,7 @@ from .utils import *
 from .segmentation.run_segmentation import *
 from .evaluation.run_evaluation import *
 from .data.download_HuBMAP_data import *
+from .evaluation.run_pairwise_evaluation import *
 
 def main(config_dir):
 	
@@ -56,10 +57,10 @@ def main(config_dir):
 					# evaluation
 					if config['evaluation'] == 1:
 						evaluation(seg_dir, mask_dir, config['segmentation'])
+						pairwise_evaluation(mask_dir, config['segmentation'])
 
 		
 def argparse_wrapper():
-
 	# arguments
 	p = ArgumentParser()
 	p.add_argument('config_dir', type=Path)

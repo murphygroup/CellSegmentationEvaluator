@@ -4,6 +4,8 @@ from os.path import join
 from pipeline.data.download_HuBMAP_data import *
 from pipeline.segmentation.methods.installation.install_all_methods import *
 from pipeline.analysis.expert_annotation.run_expert_annotation_analysis import *
+from pipeline.analysis.undersegmentation.mask_shifter import *
+from pipeline.analysis.undersegmentation.cell_merger import *
 
 if __name__ == '__main__':
 	config = {}
@@ -51,9 +53,9 @@ if __name__ == '__main__':
 		if analysis == 1 or analysis == 3:
 			expert_annotation_analysis('R001_X003_Y004')
 			expert_annotation_analysis('R001_X004_Y003')
-			
 		if analysis == 2 or analysis == 3:
-			undersegmentation_analysis
+			shifting_masks()
+			merging_cells()
 			
 	elif package_utilization == '2':
 		config['HuBMAP_data'] = 0

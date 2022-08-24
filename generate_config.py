@@ -3,6 +3,7 @@ import os
 from os.path import join
 from pipeline.data.download_HuBMAP_data import *
 from pipeline.segmentation.methods.installation.install_all_methods import *
+from pipeline.analysis.expert_annotation.run_expert_annotation_analysis import *
 
 if __name__ == '__main__':
 	config = {}
@@ -42,6 +43,18 @@ if __name__ == '__main__':
 			get_segmentation_masks(mask_path)
 			config['segmentation'] = 0
 			config['mask_dir'] = mask_path + '/HuBMAP_segmentation_masks'
+		analysis = input('Would you like to\n'
+		                 '1. Run analysis on expert annotated masks?\n'
+		                 '2. Run undersegmentation analysis?\n'
+		                 '3. Run both analysis?\n'
+		                 'Enter 1 or 2 or 3:\n')
+		if analysis == 1 or analysis == 3:
+			expert_annotation_analysis('R001_X003_Y004')
+			expert_annotation_analysis('R001_X004_Y003')
+			
+		if analysis == 2 or analysis == 3:
+			undersegmentation_analysis
+			
 	elif package_utilization == '2':
 		config['HuBMAP_data'] = 0
 		config['segmentation'] = 1

@@ -1,7 +1,7 @@
 # Cell Segmentation Evaluator: evaluation of cell segmentation methods without reference segmentations
 Haoran Chen and Robert F. Murphy\
 Carnegie Mellon University\
-V1.0 Nov. 15, 2021
+V1.0.2 Aug 24, 2022
 
 ## Description of idea
 We present here an approach that seeks to evaluate cell segmentation methods without relying upon comparison to results from humans. 

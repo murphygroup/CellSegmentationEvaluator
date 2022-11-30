@@ -19,6 +19,11 @@ The package was tested under Ubuntu 18.04 LTS.
 
 
 ## Execution
+### Step 0: Setup environment
+```bash
+python setup.py install
+```
+
 ### Step 1: Setup configuration file
 ```bash
 python generate_config.py

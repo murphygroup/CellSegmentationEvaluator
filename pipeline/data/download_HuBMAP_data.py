@@ -44,7 +44,7 @@ def get_raw_tif(TMC, tile_idx, part, idx, img_id, tissue_id, save_dir, tile_name
 		for z in range(30):
 			tif_file_name = '1_' + tile_idx + '_Z' + extend_str_zero(str(z), 3) + '_CH' + ch + '.tif'
 			try:
-				download_path = join('https://d5ebc.a567.data.globus.org', img_id, tissue_id, folder_name, tif_file_name)
+				download_path = join('https://g-d00e7b.09193a.5898.dn.glob.us', img_id, tissue_id, folder_name, tif_file_name)
 				os.system('wget -P ' +  result_dir + ' ' + download_path)
 			except:
 				pass
@@ -68,7 +68,7 @@ def get_raw_tif(TMC, tile_idx, part, idx, img_id, tissue_id, save_dir, tile_name
 			return False
 	else:
 		tif_file_name = '1_' + tile_idx + '_Z' + extend_str_zero(str(max_var_id), 3) + '_CH' + ch + '.tif'
-		download_path = join('https://d5ebc.a567.data.globus.org', img_id, tissue_id, folder_name, tif_file_name)
+		download_path = join('https://g-d00e7b.09193a.5898.dn.glob.us', img_id, tissue_id, folder_name, tif_file_name)
 		os.system('wget -P ' + result_dir + ' ' + download_path)
 		
 		# if TMC == 'Florida':
@@ -98,7 +98,7 @@ def get_CODEX_data(output_dir):
 			TMC = 'Florida'
 		save_dir = join(output_dir, img_name)
 		make_dir(save_dir)
-		os.system('wget -P ' + save_dir + ' ' + join('https://d5ebc.a567.data.globus.org', img_id, tissue_id, 'channelnames_report.csv'))
+		os.system('wget -P ' + save_dir + ' ' + join('https://g-d00e7b.09193a.5898.dn.glob.us', img_id, tissue_id, 'channelnames_report.csv'))
 		channel_info = pd.read_csv(glob.glob(join(save_dir, '*.csv'))[0], header=None).iloc[:, 0].values.tolist()
 		if TMC == 'Florida':
 			nucleus_idx = channel_info.index('DAPI-02') + 1
@@ -153,7 +153,7 @@ def get_IMC_data(output_dir):
 		tif_file_name = dataset[4]
 		save_dir = join(output_dir, img_name)
 		make_dir(save_dir)
-		os.system('wget -P ' + save_dir + ' ' + join('https://d5ebc.a567.data.globus.org', img_id, 'ometiff', tissue_id, tif_file_name))
+		os.system('wget -P ' + save_dir + ' ' + join('https://g-d00e7b.09193a.5898.dn.glob.us', img_id, 'ometiff', tissue_id, tif_file_name))
 
 
 def get_HuBMAP_data(modality, output_dir):

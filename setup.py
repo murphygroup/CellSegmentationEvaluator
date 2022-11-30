@@ -51,6 +51,7 @@ setup(
 		"scikit-learn",
 		"tifffile",
 		"opencv-python",
+                "gdown",
 	],
 	zip_safe=False,
 )

@@ -21,12 +21,12 @@ The package was tested under Ubuntu 18.04 LTS.
 ## Execution
 ### Step 0: Setup environment
 ```bash
-python setup.py install
+pip install -r requirements.txt 
 ```
 
 ### Step 1: Setup configuration file
 ```bash
-python generate_config.py
+python generate_config.py 
 ```
 This step generates config.json which contains all configurational parameters and options in order to run the evaluation pipeline. The users will be asked a series of questions about how they would like to utilize this package. The answers will be stored in config.json for the pipeline to read. Meanwhile, all necessay data, softwares and dependencies will also be automatically downloaded or installed based on users' responses.
 

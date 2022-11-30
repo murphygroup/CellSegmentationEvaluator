@@ -50,7 +50,7 @@ For more detailed introduction of segmentation quality metrics among other image
 
 ## Citation
 If you find our package useful in your research, please cite our bioRxiv paper:
-> Chen, H., & Murphy, R. F. (2021). Evaluation of cell segmentation methods without reference segmentations. bioRxiv.
+> Chen, Haoran, and Robert F. Murphy. "Evaluation of cell segmentation methods without reference segmentations." bioRxiv (2022): 2021-09.
 
 ## Contact
 

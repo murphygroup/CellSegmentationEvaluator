@@ -39,7 +39,7 @@ Run
 ```bash
 python seg_eval_main.py --img-dir [img_dir_path] --mask-dir [mask_dir_path]
 ```
-Please download and extract example images and masks from [example_data.zip](https://drive.google.com/file/d/1qtAbPQBiU4SxXFDxl-UhOShTaQszB1Ca/view?usp=share_link). The "example_data" folder contains example 2D CODEX and 3D IMC images and their corresponding cell masks.  To run them, download the example data use  
+The "example_data" folder contains example 2D CODEX and 3D IMC images and their corresponding cell masks.  To run them, download the example data use  
 
 python seg_eval_main.py --img-dir [example_data/imgs/2D_CODEX.ome.tiff] --mask-dir [example_data/masks/2D_CODEX.ome.tiff]
 

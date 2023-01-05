@@ -1,0 +1,11 @@
+numpy==1.21.6
+matplotlib
+scikit-learn==1.0.2
+opencv-python
+pandas
+scikit-image
+xmltodict
+aicsimageio==4.9.4
+pint
+bfio
+bioformats_jar

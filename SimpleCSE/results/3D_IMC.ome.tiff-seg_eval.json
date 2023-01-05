@@ -1,0 +1,24 @@
+{
+    "Segmentation Evaluation Metrics v1.5": {
+        "Cell Not Including Nucleus (cell membrane plus cytoplasm)": {
+            "1/(AvgOfWeightedAvgCVMeanCellIntensitiesOver1~10NumberOfClusters+1)": 0.5567450565441361,
+            "AvgOfWeightedAvgFractionOfFirstPCMeanCellIntensitiesOver1~10NumberOfClusters": 0.18322358897618432,
+            "AvgSilhouetteOver2~10NumberOfClusters": 0.0876643704226369
+        },
+        "Matched Cell": {
+            "1-FractionOfBackgroundOccupiedByCells": 1.0025906439112604,
+            "1/(AvgCVForegroundOutsideCells+1)": 0.31104260524313904,
+            "1/(ln(StandardDeviationOfCellSize)+1)": 0.14996549000573892,
+            "FractionOfCellMaskInForeground": 0.9822079836750122,
+            "FractionOfFirstPCForegroundOutsideCells": 0.1725867652852338,
+            "FractionOfForegroundOccupiedByCells": 0.14266366802153443,
+            "NumberOfCellsPer100CubicMicrons": 0.7077738508763257
+        },
+        "Nucleus (including nuclear membrane)": {
+            "1/(AvgOfWeightedAvgCVMeanCellIntensitiesOver1~10NumberOfClusters+1)": 0.5107179921178507,
+            "AvgOfWeightedAvgFractionOfFirstPCMeanCellIntensitiesOver1~10NumberOfClusters": 0.1667737531485708,
+            "AvgSilhouetteOver2~10NumberOfClusters": 0.07133055907968484
+        },
+        "QualityScore": 39.85449093420033
+    }
+}

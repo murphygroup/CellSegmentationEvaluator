@@ -1,32 +1,38 @@
 # Cell Segmentation Evaluator: evaluation of cell segmentation methods without reference segmentations
 Haoran Chen and Robert F. Murphy and Ted Zhang\
 Carnegie Mellon University\
-V1.2 Jan 05, 2023
+V1.3 Nov 23, 2023
 
-## Cell Segmentation Approach
-This package implements an approach for cell segmentation evaluation (CSE) without relying upon comparison to results from humans. 
+## Cell segmentation evaluation approach
+This package implements an approach for cell segmentation evaluation (CSE) without relying upon comparison to annotations from humans. 
 For this, we defined a series of segmentation quality metrics that can be applied to multichannel fluorescence images. 
 We calculated these metrics for 11 previously-described segmentation methods applied to 2D images from 4 multiplexed microscope modalities covering 5 tissues. 
 Using principal component analysis to combine the metrics we defined an overall cell segmentation quality score.
-We also defined similar metrics and quality score for 3D images.
 
-Reference: Haoran Chen and Robert F. Murphy (2022) Evaluation of cell segmentation methods without reference segmentations. Molecular Biology of the Cell.  https://doi.org/10.1091/mbc.E22-08-0364
+We also enhanced this tool by defining similar and new metrics to support 3D cell segmentations.
+
+Reference:
+
+Chen, Haoran, and Robert F. Murphy. "Evaluation of cell segmentation methods without reference segmentations." Molecular Biology of the Cell 34.6 (2023): ar50. https://doi.org/10.1091/mbc.E22-08-0364
+
+Chen, Haoran, and Robert F. Murphy. "3DCellComposer: A versatile pipeline utilizing 2D cell segmentation methods for 3D cell segmentation" (2023)
 
 ## Package contents
-This package contains two implementations of the cell segmentation metrics as well as example images for testing.  The first implementation ("SimpleCSE") just calculates metrics and quality score for one or more images and corresponding cell segmentation masks.  
-It was tested on python >=3.8 under Ubuntu 18.04 LTS.
+This package contains two implementations of the cell segmentation metrics as well as example images for testing. The first implementation ("SimpleCSE") calculates metrics and quality scores for one or more images and corresponding cell segmentation masks.  
+
+It was tested on Python >=3.8 under Ubuntu 18.04 LTS.
 
 ## SimpleCSE
 
-This folder contains a simplified version of the CSE that calculate the metrics and quality score given a multichannel image and a corresponding cell mask.  
+This folder contains a simplified version of the CSE that calculates the metrics and quality score given a multichannel image and a corresponding cell mask.  
 
-It is provided as a python main program and as an example Jupyter Notebook ("SegEvalExample.ipynb").
+It is provided as a Python main program and as an example Jupyter Notebook ("SegEvalExample.ipynb").
 
-The multichannel image should be in a format readable by AICSimageio (e.g., OME TIFF).  The masks should be in a similar format with an indexed image for cell masks in the first channel and an indexed image (with corresponding indices) for nuclear masks in the second channel.
+The multichannel image should be in a format readable by AICSimageio (e.g., OME-TIFF).  The masks should be in a similar format with an indexed image for cell masks in the first channel and an indexed image (with corresponding indices) for nuclear masks in the second channel.
 
 The output is a JSON file with the metrics and the scores.
 
-## Execution from command line
+## Execution from the command line
 ### Step 1:
 Download the "SimpleCSE" folder and change your default directory ("cd SimpleCSE") to that folder
 ### Step 2:
@@ -70,16 +76,10 @@ python run_pipeline.py configuration_file_path
 ```
 This step runs the evaluation pipeline given the generated configuration file.  
 
-## Segmentation masks of HuBMAP images
-All segmentation masks and evaluation results we generated for the paper can be download from the Google Drive folder below:
-
-https://drive.google.com/drive/folders/14tw4qrXWTt2eg64zOpYjE9cZ7OFo1i6b?usp=sharing
-
-The segmentation masks will be automatically downloaded if you choose to reproduce all results of the paper at step 1 above.
 
 ## Documentation 
 
-For more detailed introduction of segmentation quality metrics among other image quality metrics, please see
+For a more detailed introduction to segmentation quality metrics among other image quality metrics, please see
 [HuBMAP Image Quality Control Metrics](http://hubmap.scs.cmu.edu/wp-content/uploads/2021/09/HuBMAP-Image-Quality-Control-Metrics-v1.5.pdf)
 
 

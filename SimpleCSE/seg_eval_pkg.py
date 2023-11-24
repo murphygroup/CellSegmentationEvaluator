@@ -806,7 +806,7 @@ def single_method_eval_3D(img, mask, PCA_model, output_dir: Path, unit='nm', pix
 				reg.define("cell = []")
 				units = reg(unit)
 				sizes = [pixelsizex * units, pixelsizey * units, pixelsizez * units]
-				print(sizes)
+				# print(sizes)
 				units = reg
 				# voxel_size = math.prod(sizes)
 				voxel_size = sizes[0] * sizes[1] * sizes[2]
@@ -888,7 +888,7 @@ def single_method_eval_3D(img, mask, PCA_model, output_dir: Path, unit='nm', pix
 			] = avg_cell_silhouette
 	
 	# generate quality score
-	print(metrics)
+	# print(metrics)
 	metrics_flat = np.expand_dims(flatten_dict(metrics), 0)
 	try:
 		quality_score = get_quality_score(metrics_flat, PCA_model)

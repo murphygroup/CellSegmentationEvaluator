@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="432208f2-2efe-4962-ae1e-90d540f0f713" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/SimpleCSE/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SimpleCSE/.idea/SimpleCSE.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SimpleCSE/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SimpleCSE/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SimpleCSE/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SimpleCSE/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SimpleCSE/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SimpleCSE/SegEvalExample.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/SimpleCSE/SegEvalExample.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimpleCSE/seg_eval_pkg.py" beforeDir="false" afterPath="$PROJECT_DIR$/SimpleCSE/seg_eval_pkg.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +37,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1700768961758</updated>
-      <workItem from="1700768962882" duration="7739000" />
+      <workItem from="1700768962882" duration="8265000" />
     </task>
     <servers />
   </component>

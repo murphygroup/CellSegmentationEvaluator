@@ -1,24 +1,25 @@
 {
     "Segmentation Evaluation Metrics v1.5": {
         "Cell Not Including Nucleus (cell membrane plus cytoplasm)": {
-            "1/(AvgOfWeightedAvgCVMeanCellIntensitiesOver1~10NumberOfClusters+1)": 0.5567450565441361,
-            "AvgOfWeightedAvgFractionOfFirstPCMeanCellIntensitiesOver1~10NumberOfClusters": 0.18322358897618432,
-            "AvgSilhouetteOver2~10NumberOfClusters": 0.0876643704226369
+            "1/(AvgOfWeightedAvgCVMeanCellIntensitiesOver1~10NumberOfClusters+1)": 0.555539281578267,
+            "AvgOfWeightedAvgFractionOfFirstPCMeanCellIntensitiesOver1~10NumberOfClusters": 0.18492543709576048,
+            "AvgSilhouetteOver1~10NumberOfClusters": 0.09949116655140815
         },
         "Matched Cell": {
-            "1-FractionOfBackgroundOccupiedByCells": 1.0025906439112604,
-            "1/(AvgCVForegroundOutsideCells+1)": 0.31104260524313904,
-            "1/(ln(StandardDeviationOfCellSize)+1)": 0.14996549000573892,
-            "FractionOfCellMaskInForeground": 0.9822079836750122,
-            "FractionOfFirstPCForegroundOutsideCells": 0.1725867652852338,
-            "FractionOfForegroundOccupiedByCells": 0.14266366802153443,
-            "NumberOfCellsPer100CubicMicrons": 0.7077738508763257
+            "1-FractionOfBackgroundOccupiedByCells": 0.8169313900712654,
+            "1/(AvgCVForegroundOutsideCells+1)": 0.31324021990306844,
+            "1/(CVOfCellSize+1)": 0.7173306442825295,
+            "FractionOfCellMaskInForeground": 0.9651429506031927,
+            "FractionOfFirstPCForegroundOutsideCells": 0.17463488462068044,
+            "FractionOfForegroundOccupiedByCells": 0.5828236222106423,
+            "NumberOfCellsPer100CubicMicrons": 0.09183568058951136,
+            "WeightedAvgCellSizeinCubicMicrons": 681.3255317265257
         },
         "Nucleus (including nuclear membrane)": {
-            "1/(AvgOfWeightedAvgCVMeanCellIntensitiesOver1~10NumberOfClusters+1)": 0.5107179921178507,
-            "AvgOfWeightedAvgFractionOfFirstPCMeanCellIntensitiesOver1~10NumberOfClusters": 0.1667737531485708,
-            "AvgSilhouetteOver2~10NumberOfClusters": 0.07133055907968484
+            "1/(AvgOfWeightedAvgCVMeanCellIntensitiesOver1~10NumberOfClusters+1)": 0.5009548984989369,
+            "AvgOfWeightedAvgFractionOfFirstPCMeanCellIntensitiesOver1~10NumberOfClusters": 0.19543225539965145,
+            "AvgSilhouetteOver1~10NumberOfClusters": 0.04568973987345392
         },
-        "QualityScore": 39.85449093420033
+        "QualityScore": 78.5524038988313
     }
 }

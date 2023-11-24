@@ -19,6 +19,7 @@ Chen, Haoran, and Robert F. Murphy. "3DCellComposer: A versatile pipeline utiliz
 
 ## Package contents
 This package contains two implementations of the cell segmentation metrics as well as example images for testing. The first implementation ("SimpleCSE") calculates metrics and quality scores for one or more images and corresponding cell segmentation masks.  
+
 It was tested on Python >=3.8 under Ubuntu 18.04 LTS.
 
 ## SimpleCSE

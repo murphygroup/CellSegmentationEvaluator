@@ -22,6 +22,8 @@ This package contains two implementations of the cell segmentation metrics as we
 
 It was tested on Python >=3.8 under Ubuntu 18.04 LTS.
 
+**Important:** This repository uses Git LFS for tracking large files. Please ensure you have [Git LFS](https://git-lfs.github.com/) installed on your machine before cloning or pulling.
+
 ## SimpleCSE
 
 This folder contains a simplified version of the CSE that calculates the metrics and quality score given a multichannel image and a corresponding cell mask.  

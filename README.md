@@ -1,13 +1,13 @@
 # Cell Segmentation Evaluator: evaluation of cell segmentation methods without reference segmentations
 Haoran Chen and Robert F. Murphy and Ted Zhang\
 Carnegie Mellon University\
-V1.3 Nov 23, 2023
+V1.3.1 Dec 10, 2023
 
 ## Cell segmentation evaluation approach
-This package implements an approach for cell segmentation evaluation (CSE) without relying upon comparison to annotations from humans. 
+This package implements an approach for cell segmentation evaluation (CSE) that does not rely upon comparison to annotations from humans. 
 For this, we defined a series of segmentation quality metrics that can be applied to multichannel fluorescence images. 
 We calculated these metrics for 11 previously-described segmentation methods applied to 2D images from 4 multiplexed microscope modalities covering 5 tissues. 
-Using principal component analysis to combine the metrics we defined an overall cell segmentation quality score.
+Using principal component analysis to combine the metrics, we defined an overall cell segmentation quality score.
 
 We also enhanced this tool by defining similar and new metrics to support 3D cell segmentations.
 
@@ -18,11 +18,16 @@ Chen, Haoran, and Robert F. Murphy. "Evaluation of cell segmentation methods wit
 Chen, Haoran, and Robert F. Murphy. "3DCellComposer: A versatile pipeline utilizing 2D cell segmentation methods for 3D cell segmentation" (2023)
 
 ## Package contents
-This package contains two implementations of the cell segmentation metrics as well as example images for testing. The first implementation ("SimpleCSE") calculates metrics and quality scores for one or more images and corresponding cell segmentation masks.  
+This package contains two implementations of the cell segmentation metrics as well as example images for testing. The first implementation ("SimpleCSE") calculates metrics and quality scores for one or more images and corresponding cell segmentation masks.  The second ("full_pipeline") runs different cell segmentation programs on a given multichannel image and evaluates the resulting segmentations using the metrics.
 
 It was tested on Python >=3.8 under Ubuntu 18.04 LTS.
 
 **Important:** This repository uses Git LFS for tracking large files. Please ensure you have [Git LFS](https://git-lfs.github.com/) installed on your machine before cloning or pulling.
+
+## Input files
+
+Two input files are required, one containing a multichannel image (e.g., CODEX image) and the other containing the segmentation mask image to evaluate.  The mask image should contain channels for a cell mask and a nucleus mask (in that order).  Other mask channels may be present but will be ignored.  Each channel should contain an indexed image, in which pixels contain the integer number of the cell that that pixel belongs to.
+
 
 ## SimpleCSE
 
@@ -45,14 +50,17 @@ pip install -r requirements.txt
 ### Step 3
 Run
 ```bash
-python seg_eval_main.py --img-dir [img_dir_path] --mask-dir [mask_dir_path]
+python seg_eval_main.py [img_dir_path] [mask_dir_path]
 ```
-The "example_data" folder contains example 2D CODEX and 3D IMC images and their corresponding cell masks.  To run them, download the example data use  
+The "example_data" folder contains example 2D CODEX and 3D IMC images and their corresponding cell masks.  To run them, use
 
-python seg_eval_main.py --img-dir [example_data/imgs/2D_CODEX.ome.tiff] --mask-dir [example_data/masks/2D_CODEX.ome.tiff]
+```bash
+python seg_eval_main.py example_data/imgs/2D_CODEX.ome.tiff example_data/masks/2D_CODEX.ome.tiff
+```
 
-python seg_eval_main.py --img-dir [example_data/imgs/3D_IMC.ome.tiff] --mask-dir [example_data/masks/3D_IMC.ome.tiff]
-
+```bash
+python seg_eval_main.py example_data/imgs/3D_IMC.ome.tiff example_data/masks/3D_IMC.ome.tiff
+```
 
 ##full CSE pipeline
 

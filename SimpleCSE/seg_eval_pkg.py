@@ -20,12 +20,15 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
 import warnings
+from cellnuclearmatching import get_matched_masks, get_matched_fraction
 
 warnings.filterwarnings('ignore')
 
 """
 Package functions that evaluate a single cell segmentation mask for a single image
 Authors: Haoran Chen and Ted Zhang and Robert F. Murphy
+Version: 1.4 December 11, 2023 R.F.Murphy
+        repair nuclear masks outside cell masks and mismatched cells and nuclei
 """
 
 schema_url_pattern = re.compile(r"\{(.+)\}OME")
@@ -593,13 +596,26 @@ def single_method_eval(img, mask, PCA_model, output_dir: Path, bz=0, unit='nanom
 	print("Calculating evaluation metrics v1.5 for", img["name"])
 	# get best z slice for future use
 	bestz = bz
-	
+
+	#print(mask["data"].shape)
 	# get compartment masks
-	matched_mask = np.squeeze(mask["data"][0, :, bestz, :, :])
-	# print(matched_mask.shape)
-	cell_matched_mask = matched_mask[0]
-	nuclear_matched_mask = matched_mask[1]
-	cell_outside_nucleus_mask = cell_matched_mask - nuclear_matched_mask
+	#old code
+	#matched_mask = np.squeeze(mask["data"][0, :, bestz, :, :])
+	#print(matched_mask.shape)
+	#cell_matched_mask = matched_mask[0]
+	#nuclear_matched_mask = matched_mask[1]
+	#cell_outside_nucleus_mask = cell_matched_mask - nuclear_matched_mask
+	#print(cell_outside_nucleus_mask.shape)
+	#print(len(np.unique(np.ndarray.flatten(cell_outside_nucleus_mask))))
+	#new code with corrected matching
+	cell_matched_mask, nuclear_matched_mask, cell_outside_nucleus_mask = get_matched_masks(mask["data"][:,0,bestz,:,:],mask["data"][:,1,bestz,:,:])
+	#print(cell_matched_mask.shape)
+	cell_matched_mask = np.squeeze(cell_matched_mask)
+	nuclear_matched_mask = np.squeeze(nuclear_matched_mask)
+	cell_outside_nucleus_mask = np.squeeze(cell_outside_nucleus_mask)
+	#print(cell_matched_mask.shape)
+	#print(len(np.unique(np.ndarray.flatten(cell_matched_mask))),len(np.unique(np.ndarray.flatten(nuclear_matched_mask))),len(np.unique(np.ndarray.flatten(cell_outside_nucleus_mask))))
+
 	
 	metric_mask = np.expand_dims(cell_matched_mask, 0)
 	metric_mask = np.vstack((metric_mask, np.expand_dims(nuclear_matched_mask, 0)))
@@ -653,8 +669,9 @@ def single_method_eval(img, mask, PCA_model, output_dir: Path, bz=0, unit='nanom
 					"Value"
 				]["OriginalMetadata"]["Value"]
 			except:
-				matched_fraction = 1.0
-			
+				#matched_fraction = 1.0
+				matched_fraction = get_matched_fraction('nonrepaired_matched_mask', np.squeeze(mask["data"][:,0,bestz,:,:]), cell_matched_mask, np.squeeze(mask["data"][:,1,bestz,:,:]))
+				#print('Matched fraction='+str(matched_fraction))
 			try:
 				units, pixel_size = get_pixel_area(img["img"])
 			except:

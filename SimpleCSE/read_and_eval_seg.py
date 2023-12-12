@@ -11,10 +11,12 @@ import pickle
 MAIN FUNCTION TO CALCULATE SEGMENTATION EVALUATION STATISTICS FOR A
 FOR A SINGLE IMAGE AND MASK
 Author: Robert F. Murphy and Haoran Chen and Ted Zhang
+Version: 1.4 December 11, 2023
 """
     
 def read_and_eval_seg(img_path, mask_path, PCA_model, output_directory):
 
+    print('CellSegmentationEvaluator (SimpleCSE) v1.4')
     aimg = AICSImage(img_path)
     img = {}
     iheadtail = split(img_path)

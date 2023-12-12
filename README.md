@@ -1,7 +1,7 @@
 # Cell Segmentation Evaluator: evaluation of cell segmentation methods without reference segmentations
 Haoran Chen and Robert F. Murphy and Ted Zhang\
 Carnegie Mellon University\
-V1.3.1 Dec 10, 2023
+V1.4 Dec 11, 2023
 
 ## Cell segmentation evaluation approach
 This package implements an approach for cell segmentation evaluation (CSE) that does not rely upon comparison to annotations from humans. 
@@ -26,7 +26,7 @@ It was tested on Python >=3.8 under Ubuntu 18.04 LTS.
 
 ## Input files
 
-Two input files are required, one containing a multichannel image (e.g., CODEX image) and the other containing the segmentation mask image to evaluate.  The mask image should contain channels for a cell mask and a nucleus mask (in that order).  Other mask channels may be present but will be ignored.  Each channel should contain an indexed image, in which pixels contain the integer number of the cell that that pixel belongs to.
+Two input files are required, one containing a multichannel image (e.g., CODEX image) and the other containing the segmentation mask image to evaluate.  The mask image should contain channels for a cell mask and a nucleus mask (in that order).  Other mask channels may be present but will be ignored.  Each channel should contain an indexed image, in which pixels contain the integer number of the cell that that pixel belongs to.  Note that nuclear masks should not extend beyond cell masks; such nuclear masks will be truncated.  Note also that cell and/or nuclear masks that are not matched will be ignored but reflected in the 'FractionOfMatchedCellsAndNuclei' metric.
 
 
 ## SimpleCSE

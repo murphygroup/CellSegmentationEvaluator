@@ -3,7 +3,7 @@ import json
 from aicsimageio import AICSImage
 import numpy as np
 from PIL import Image
-from seg_eval_pkg import *
+from CellSegmentationEvaluator import *
 from os.path import split
 import pickle
 
@@ -50,18 +50,18 @@ def read_and_eval_seg(img_path, mask_path, PCA_model, output_directory):
             img['data'][0, :, iii, :, :] = img['data'][0, :, bestz, :, :]
 
     if isinstance(bestz,int):
-        if PCA_model==[]:
-            try:
-                PCA_model = pickle.load(open( "2D_PCA_model.pickle", "rb" ))
-            except:
-                print('2D PCA model file missing')
+        #if PCA_model==[]:
+        #    try:
+        #        PCA_model = pickle.load(open( "2D_PCA_model.pickle", "rb" ))
+        #    except:
+        #        print('2D PCA model file missing')
         seg_metrics = single_method_eval(img, mask, PCA_model, output_directory, bz=bestz)
     else:
-        if PCA_model==[]:
-            try:
-                PCA_model = pickle.load( open( "3D_PCA_model.pickle", "rb" ))
-            except:
-                print('3D PCA model file missing')
+        #if PCA_model==[]:
+        #    try:
+        #        PCA_model = pickle.load( open( "3D_PCA_model.pickle", "rb" ))
+        #    except:
+        #        print('3D PCA model file missing')
         seg_metrics = single_method_eval_3D(img, mask, PCA_model, output_directory)
 
     #print(seg_metrics)

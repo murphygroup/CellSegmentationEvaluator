@@ -1,0 +1,52 @@
+# Cell Segmentation Evaluator: evaluation of cell segmentation methods without reference segmentations
+Haoran Chen and Robert F. Murphy and Ted Zhang\
+Carnegie Mellon University\
+V1.5.9 February 8, 2024
+
+## Cell segmentation evaluation approach
+This package implements an approach for cell segmentation evaluation (CSE) that does not rely upon comparison to annotations from humans. For this, we defined a series of segmentation quality metrics that can be applied to multichannel images. The metrics are designed mainly for tissue images assuming that (1) there are multiple channels, and (2) there are multiple cell types that are expected to differ in their expression values for the channels. We calculated these metrics for 11 previously-described segmentation methods applied to 2D images from 4 multiplexed microscope modalities covering 5 tissues. Using principal component analysis to combine the metrics, we defined an overall cell segmentation quality score. The individual metrics and the quality score are returned.
+
+The package supports both 2D and 3D images. It can be installed using
+```bash
+pip install CellSegmentationEvaluator
+```
+
+Then import the desired function, e.g., 
+```bash
+from CellSegmentationEvaluator import single_method_eval, single_method_eval3D, CSE3D
+```
+
+There are three main functions to evaluate an image and associated masks.  For providing inputs as AICSImage object (see https://github.com/AllenCellModeling/aicsimageio and https://pypi.org/project/aicsimageio/), use 
+```bash
+single_method_eval(imgpath, maskpath) #for 2D
+single_method_eval3D(imgpath, maskpath) #for 3D
+```
+Or for providing 3D images and masks as nd-arrays, use
+```bash
+CSE3D(img, mask, [PCAmodel], [threshimage], [voxel_size])
+```
+where PCAmodel defaults to "3Dv1.6", threshimage defaults to the sum of all channels, and the voxel size is in cubic micrometers and defaults to 1.
+
+Reference:
+
+Chen, Haoran, and Robert F. Murphy. "Evaluation of cell segmentation methods without reference segmentations." Molecular Biology of the Cell 34.6 (2023): ar50. https://doi.org/10.1091/mbc.E22-08-0364
+
+Chen, Haoran, and Robert F. Murphy. "3DCellComposer: A versatile pipeline utilizing 2D cell segmentation methods for 3D cell segmentation" (2024) under review
+
+## Inputs
+
+Two input files are required, one containing a multichannel image (e.g., CODEX image) and the other containing the segmentation mask image to evaluate.  The mask image should contain channels for a cell mask and a nucleus mask (in that order).  Other mask channels may be present but will be ignored.  Each channel should contain an indexed image, in which pixels contain the integer number of the cell that that pixel belongs to.  Note that nuclear masks should not extend beyond cell masks; such nuclear masks will be truncated.  Note also that cell and/or nuclear masks that are not matched will be ignored but reflected in the 'FractionOfMatchedCellsAndNuclei' metric.
+
+
+## Examples
+
+Please see https://github.com/murphygroup/CellSegmentationEvaluator for examples of use.  In the the SimpleCSE folder are an example python main program ("read_and_eval_seg.py") and a Jupyter Notebook ("SegEvalExample.ipynb") that read input files and call CellSegmentationEvaluator.
+
+The multichannel image should be in a format readable by AICSimageio (e.g., OME-TIFF).  The masks should be in a similar format with an indexed image for cell masks in the first channel and an indexed image (with corresponding indices) for nuclear masks in the second channel.
+
+The output is a JSON file with the metrics and the scores.
+
+## Contact
+
+Robert F. Murphy - murphy@cmu.edu\
+Haoran Chen - hrchen@cmu.edu

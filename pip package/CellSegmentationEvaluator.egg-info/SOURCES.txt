@@ -1,0 +1,14 @@
+LICENSE
+README.md
+setup.py
+CellSegmentationEvaluator/CSE3D.py
+CellSegmentationEvaluator/CellSegmentationEvaluator.py
+CellSegmentationEvaluator/__init__.py
+CellSegmentationEvaluator/functions.py
+CellSegmentationEvaluator/single_method_eval.py
+CellSegmentationEvaluator/single_method_eval_3D.py
+CellSegmentationEvaluator.egg-info/PKG-INFO
+CellSegmentationEvaluator.egg-info/SOURCES.txt
+CellSegmentationEvaluator.egg-info/dependency_links.txt
+CellSegmentationEvaluator.egg-info/requires.txt
+CellSegmentationEvaluator.egg-info/top_level.txt

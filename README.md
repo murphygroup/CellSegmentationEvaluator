@@ -1,15 +1,31 @@
 # Cell Segmentation Evaluator: evaluation of cell segmentation methods without reference segmentations
 Haoran Chen and Robert F. Murphy and Ted Zhang\
 Carnegie Mellon University\
-V1.4 Dec 11, 2023
+V1.5 January 31, 2024
 
-## Cell segmentation evaluation approach
-This package implements an approach for cell segmentation evaluation (CSE) that does not rely upon comparison to annotations from humans. 
-For this, we defined a series of segmentation quality metrics that can be applied to multichannel fluorescence images. 
-We calculated these metrics for 11 previously-described segmentation methods applied to 2D images from 4 multiplexed microscope modalities covering 5 tissues. 
-Using principal component analysis to combine the metrics, we defined an overall cell segmentation quality score.
+This package implements an approach for cell segmentation evaluation (CSE) that does not rely upon comparison to annotations from humans. For this, we defined a series of segmentation quality metrics that can be applied to multichannel images. The metrics are designed mainly for tissue images assuming that (1) there are multiple channels, and (2) there are multiple cell types that are expected to differ in their expression values for the channels. We calculated these metrics for 11 previously-described segmentation methods applied to 2D images from 4 multiplexed microscope modalities covering 5 tissues. Using principal component analysis to combine the metrics, we defined an overall cell segmentation quality score. The individual metrics and the quality score are returned.
 
-We also enhanced this tool by defining similar and new metrics to support 3D cell segmentations.
+The package supports both 2D and 3D images. It can be installed using
+
+```bash
+pip install CellSegmentationEvaluator
+```
+
+Then import the desired function, e.g., 
+```bash
+from CellSegmentationEvaluator import single_method_eval, single_method_eval3D, CSE3D
+```
+
+There are three main functions to evaluate an image and associated masks.  For providing inputs as AICSImage structures, use 
+```bash
+single_method_eval(imgpath, maskpath) #for 2D
+single_method_eval3D(imgpath, maskpath) #for 3D
+```
+Or for providing 3D images and masks as nd-arrays, use
+```bash
+CSE3D(img, mask, [PCAmodel], [threshimage], [voxel_size])
+```
+where PCAmodel defaults to "3Dv1.6", threshimage defaults to the same of all channels, and the voxel size is in cubic micrometers and defaults to 1.
 
 Reference:
 
@@ -17,8 +33,8 @@ Chen, Haoran, and Robert F. Murphy. "Evaluation of cell segmentation methods wit
 
 Chen, Haoran, and Robert F. Murphy. "3DCellComposer: A versatile pipeline utilizing 2D cell segmentation methods for 3D cell segmentation" (2023)
 
-## Package contents
-This package contains two implementations of the cell segmentation metrics as well as example images for testing. The first implementation ("SimpleCSE") calculates metrics and quality scores for one or more images and corresponding cell segmentation masks.  The second ("full_pipeline") runs different cell segmentation programs on a given multichannel image and evaluates the resulting segmentations using the metrics.
+## Repository contents
+This repository contains two implementations of the cell segmentation metrics as well as example images for testing. The first implementation ("SimpleCSE") calculates metrics and quality scores for one or more images and corresponding cell segmentation masks.  The second ("full_pipeline") runs different cell segmentation programs on a given multichannel image and evaluates the resulting segmentations using the metrics.  There is also a PyPI package described above.
 
 It was tested on Python >=3.8 under Ubuntu 18.04 LTS.
 
@@ -92,6 +108,9 @@ This step runs the evaluation pipeline given the generated configuration file.
 For a more detailed introduction to segmentation quality metrics among other image quality metrics, please see
 [HuBMAP Image Quality Control Metrics](http://hubmap.scs.cmu.edu/wp-content/uploads/2021/09/HuBMAP-Image-Quality-Control-Metrics-v1.5.pdf)
 
+## Changes from v1.4 to v1.5
+
+Reconcile differences with the 3D cell segmentation evaluation code in 3DCellComposer.  Convert seg_eval_pkg.py to a PyPI package named CellSegmentationEvaluator and import that package for use in SimpleCSE.  Add new function CSE3D as an alternative to "single_method_eval_3D" so that inputs can be nd-arrays rather than AICSImage structures.
 
 ## Contact
 

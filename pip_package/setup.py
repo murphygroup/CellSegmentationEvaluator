@@ -15,7 +15,7 @@ setup(
     author_email='murphy@cmu.edu',
     license='MIT',
     packages=['CellSegmentationEvaluator'],
-    install_requires=['numpy', 're', 'xml', 'xmltodict', 'pandas', 'math', 'pathlib', 'typing', 'json', 'pint', 'scipy', 'skimage', 'sklearn', 'tifffile', 'warnings', 'aicsimageio'],
+    install_requires=['numpy', 'xmltodict', 'pandas', 'pint', 'scipy', 'scikit-image', 'scikit-learn', 'tifffile', 'aicsimageio'],
 
     classifiers=[
         'Development Status :: 5 - Production/Stable',

@@ -18,6 +18,8 @@ img_path = args.img_path
 mask_path = args.mask_path
 
 output_directory = Path('results')
+if not output_directory.exists():
+    output_directory.mkdir()
 
 # can edit this program to specify a PCA model, or let read_and_eval_seg use the default based on whether image is 2D or 3D
 #PCA_model = pickle.load(open( "2D_PCA_model.pickle", "rb" ))

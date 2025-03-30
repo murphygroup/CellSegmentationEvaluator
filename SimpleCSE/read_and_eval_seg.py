@@ -3,7 +3,7 @@ import json
 from aicsimageio import AICSImage
 import numpy as np
 from PIL import Image
-from CellSegmentationEvaluator import *
+from CellSegmentationEvaluator.CellSegmentationEvaluator import single_method_eval
 from os.path import split
 import pickle
 
@@ -11,12 +11,12 @@ import pickle
 MAIN FUNCTION TO CALCULATE SEGMENTATION EVALUATION STATISTICS FOR A
 FOR A SINGLE IMAGE AND MASK
 Author: Robert F. Murphy and Haoran Chen and Ted Zhang
-Version: 1.4 December 11, 2023
+Version: 1.5.12 March 30, 2025
 """
     
 def read_and_eval_seg(img_path, mask_path, PCA_model, output_directory):
 
-    print('CellSegmentationEvaluator (SimpleCSE) v1.4')
+    print('CellSegmentationEvaluator (SimpleCSE) v1.5.12')
     aimg = AICSImage(img_path)
     img = {}
     iheadtail = split(img_path)
@@ -70,6 +70,7 @@ def read_and_eval_seg(img_path, mask_path, PCA_model, output_directory):
     with open(
              output_directory / (img["name"] + "-seg_eval.json"), "w"
     ) as json_file:
-            json.dump(struct, json_file, indent=4, sort_keys=True, cls=NumpyEncoder)
+            #json.dump(struct, json_file, indent=4, sort_keys=True, cls=NumpyEncoder)
+            json.dump(struct, json_file)
 
     return seg_metrics

@@ -1,7 +1,7 @@
 # Cell Segmentation Evaluator: evaluation of cell segmentation methods without reference segmentations
 Haoran Chen and Robert F. Murphy and Ted Zhang\
 Carnegie Mellon University\
-V1.5 January 31, 2024
+V1.5.12 March 30, 2025
 
 This package implements an approach for cell segmentation evaluation (CSE) that does not rely upon comparison to annotations from humans. For this, we defined a series of segmentation quality metrics that can be applied to multichannel images. The metrics are designed mainly for tissue images assuming that (1) there are multiple channels, and (2) there are multiple cell types that are expected to differ in their expression values for the channels. We calculated these metrics for 11 previously-described segmentation methods applied to 2D images from 4 multiplexed microscope modalities covering 5 tissues. Using principal component analysis to combine the metrics, we defined an overall cell segmentation quality score. The individual metrics and the quality score are returned.
 
@@ -112,7 +112,12 @@ For a more detailed introduction to segmentation quality metrics among other ima
 
 Reconcile differences with the 3D cell segmentation evaluation code in 3DCellComposer.  Convert seg_eval_pkg.py to a PyPI package named CellSegmentationEvaluator and import that package for use in SimpleCSE.  Add new function CSE3D as an alternative to "single_method_eval_3D" so that inputs can be nd-arrays rather than AICSImage structures.
 
+## Changes from v1.5 to v1.5.12
+
+Correct setup.py in pip_package and requirements.txt in SimpleCSE.
+Create results folder in SimpleCSE if doesn't exist.
+
 ## Contact
 
 Robert F. Murphy - murphy@cmu.edu\
-Haoran Chen - hrchen@cmu.edu
+Haoran Chen - hrchen@cs.cmu.edu

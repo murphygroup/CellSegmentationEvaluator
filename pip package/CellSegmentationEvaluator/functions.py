@@ -32,6 +32,12 @@ Version: 1.4 December 11, 2023 R.F.Murphy
         repair nuclear masks outside cell masks and mismatched cells and nuclei
          1.5 January 18, 2024 R.F.Murphy
         add CSE3D as simpler function for 3D evaluation
+Version: 1.5.13 April 1, 2025 R.F.Murphy
+        correct cell uniformity_CV calculation to handle undefined CVs
+        remove calls to pint for getting physical dimensions
+Version: 1.5.14 April 3, 2025 R.F.Murphy
+        fix errors in 1.5.13 fixes
+        correct uniformity_CV to handle channels means of 0
 """
 
 schema_url_pattern = re.compile(r"\{(.+)\}OME")
@@ -163,10 +169,18 @@ def uniformity_CV(loc, channels):
 	n = len(channels)
 	for i in range(n):
 		channel = channels[i]
-		channel = channel / np.mean(channel)
-		intensity = channel[tuple(loc.T)]
-		CV.append(np.std(intensity))
-	return np.average(CV)
+		if np.mean(channel) == 0:
+			print(f"Channel {i} has undefined CV for foreground outside cells")
+			CV.append(np.nan)
+		else:
+			channel = channel / np.mean(channel)
+			intensity = channel[tuple(loc.T)]
+			CV.append(np.std(intensity))
+	# this will ignore above nan's unless all are nan
+	val=np.nanmean(CV)
+	if np.isnan(val):
+		print("CVs undefined for all channels for foreground outside cells")
+	return val
 
 
 def uniformity_fraction(loc, channels) -> float:
@@ -254,15 +268,20 @@ def background_uniformity(img_bi, channels):
 def cell_uniformity_CV(feature_matrix):
 	CV = []
 	for i in range(feature_matrix.shape[1]):
-		if np.sum(feature_matrix[:, i]) == 0:
+		#CV undefined if feature mean is zero but st.dev. is not
+		if np.max(feature_matrix[:, i])==np.min(feature_matrix[:, i]):
+			CV.append(0)
+		elif np.sum(feature_matrix[:, i]) == 0:
 			CV.append(np.nan)
+			print(f"Feature {i} has undefined CV")
 		else:
 			CV.append(variation(feature_matrix[:, i]))
 
-	if np.sum(np.nan_to_num(CV)) == 0:
-		return 0
-	else:
-		return np.nanmean(CV)
+	# this will ignore nan's (undef CVs) but returns nan if all are nan
+	val=np.nanmean(CV)
+	if np.isnan(val):
+		print("CVs undefined for all features")
+	return val
 
 
 def cell_uniformity_fraction(feature_matrix):
@@ -478,11 +497,13 @@ def get_quality_score(features, model):
 
 def get_physical_dimension_func(
 		dimensions: int,
-) -> Callable[[AICSImage], Tuple[UnitRegistry, Quantity]]:
-	dimension_names = "XYZ"
+) -> Callable[[AICSImage], Quantity]:
+#) -> Callable[[AICSImage], Tuple[UnitRegistry, Quantity]]:
+#	dimension_names = "XYZ"
 
 
-	def physical_dimension_func(img: AICSImage) -> Tuple[UnitRegistry, Quantity]:
+	#def physical_dimension_func(img: AICSImage) -> Tuple[UnitRegistry, Quantity]:
+	def physical_dimension_func(img: AICSImage) -> Quantity:
 		"""
         Returns area of each pixel (if dimensions == 2) or volume of each
         voxel (if dimensions == 3) as a pint.Quantity. Also returns the
@@ -525,17 +546,21 @@ def get_physical_dimension_func(
 		#breakpoint()
 
 		print('Assuming OME pixel sizes are in microns...')
-		sizes: List[Quantity] = []
+		#sizes: List[Quantity] = []
+		sizes = []
 		for idim in range(dimensions):
 		#	unit = reg[phyunit[idim]]
-			unit = reg["um"]
-			sizes.append(physize[idim] * unit)
+		#	unit = reg["um"]
+		#	sizes.append(physize[idim] * unit)
+			sizes.append(physize[idim])
 
-		size: Quantity = math.prod(sizes)
-		return reg, size
+		#size: Quantity = math.prod(sizes)
+		size = math.prod(sizes)
+		print(f"inside physical_dimension_func {size}")
+		#return reg, size
+		return size
 
 	return physical_dimension_func
-
 
 get_voxel_volume = get_physical_dimension_func(3)
 get_pixel_area = get_physical_dimension_func(2)

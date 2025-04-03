@@ -9,7 +9,7 @@ import numpy as np
 import xmltodict
 #import pandas as pd
 #from PIL import Image
-from pint import Quantity, UnitRegistry
+#from pint import Quantity, UnitRegistry
 #from scipy.sparse import csr_matrix
 #from scipy.stats import variation
 #from skimage.filters import threshold_mean, threshold_otsu
@@ -34,6 +34,8 @@ Version: 1.4 December 11, 2023 R.F.Murphy
         repair nuclear masks outside cell masks and mismatched cells and nuclei
          1.5 January 18, 2024 R.F.Murphy
         add CSE3D as simpler function for 3D evaluation
+         1.5.13 April 3, 2025 R.F.Murphy
+        remove pint
 """
 
 def single_method_eval_3D(img, mask, PCA_model, output_dir: Path, unit='um', pixelsizex=1, pixelsizey=1,

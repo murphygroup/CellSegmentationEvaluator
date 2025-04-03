@@ -1,17 +1,18 @@
-from pathlib import Path
+#from pathlib import Path
 import json
 from aicsimageio import AICSImage
 import numpy as np
-from PIL import Image
-from CellSegmentationEvaluator.CellSegmentationEvaluator import single_method_eval
+#from PIL import Image
+from CellSegmentationEvaluator.CellSegmentationEvaluator import single_method_eval, single_method_eval_3D
 from os.path import split
-import pickle
+#import pickle
 
 """
 MAIN FUNCTION TO CALCULATE SEGMENTATION EVALUATION STATISTICS FOR A
 FOR A SINGLE IMAGE AND MASK
 Author: Robert F. Murphy and Haoran Chen and Ted Zhang
-Version: 1.5.12 March 30, 2025
+Version: 1.5.14 April 3, 2025
+        juat remove unnecessary imports
 """
     
 def read_and_eval_seg(img_path, mask_path, PCA_model, output_directory):

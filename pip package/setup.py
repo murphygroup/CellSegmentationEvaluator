@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='CellSegmentationEvaluator',
-    version='1.5.11',    
+    version='1.5.14',    
     description='Functions for reference-free evaluation of the quality of cell segmentations',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -15,7 +15,7 @@ setup(
     author_email='murphy@cmu.edu',
     license='MIT',
     packages=['CellSegmentationEvaluator'],
-    install_requires=['numpy', 'xmltodict', 'pandas', 'pint', 'scipy', 'scikit-image', 'scikit-learn', 'tifffile', 'aicsimageio'],
+    install_requires=['numpy', 'xmltodict', 'pandas', 'scipy', 'scikit-image', 'scikit-learn', 'tifffile', 'aicsimageio'],
 
     classifiers=[
         'Development Status :: 5 - Production/Stable',

@@ -9,7 +9,7 @@ import numpy as np
 import xmltodict
 #import pandas as pd
 #from PIL import Image
-#from pint import Quantity, UnitRegistry
+from pint import Quantity, UnitRegistry
 #from scipy.sparse import csr_matrix
 #from scipy.stats import variation
 #from skimage.filters import threshold_mean, threshold_otsu
@@ -21,7 +21,7 @@ import xmltodict
 #from sklearn.metrics import silhouette_score
 #from sklearn.preprocessing import StandardScaler
 #import tifffile
-from CellSegmentationEvaluator.functions import cell_size_uniformity, foreground_separation, fraction, foreground_uniformity, cell_type, cell_uniformity, getPCAmodel, get_quality_score
+from CellSegmentationEvaluator.functions import cell_size_uniformity, foreground_separation, fraction, foreground_uniformity, cell_type, cell_uniformity, getPCAmodel, get_quality_score, get_matched_masks, thresholding, get_matched_fraction, flatten_dict
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -33,10 +33,13 @@ Version: 1.4 December 11, 2023 R.F.Murphy
         repair nuclear masks outside cell masks and mismatched cells and nuclei
          1.5 January 18, 2024 R.F.Murphy
         add CSE3D as simpler function for 3D evaluation
+         1.5.15 April 4, 2025 R.F.Murphy
+        
 """
 
 def single_method_eval(img, mask, PCA_model, output_dir: Path, bz=0, unit='nanometer', pixelsizex=377.5,
                        pixelsizey=377.5):
+	print("CellSegmentationEvaluator v1.5.15")
 	print("Calculating evaluation metrics v1.5 for", img["name"])
 	# get best z slice for future use
 	bestz = bz

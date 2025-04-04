@@ -3,7 +3,8 @@ import json
 from aicsimageio import AICSImage
 import numpy as np
 #from PIL import Image
-from CellSegmentationEvaluator.CellSegmentationEvaluator import single_method_eval, single_method_eval_3D
+from CellSegmentationEvaluator.single_method_eval import single_method_eval
+from CellSegmentationEvaluator.single_method_eval_3D import single_method_eval_3D
 from os.path import split
 #import pickle
 

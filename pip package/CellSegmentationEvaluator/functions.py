@@ -9,7 +9,8 @@ import numpy as np
 #import xmltodict
 import pandas as pd
 #from PIL import Image
-from pint import Quantity, UnitRegistry
+#from pint import Quantity, UnitRegistry
+from pint import Quantity
 from scipy.sparse import csr_matrix
 from scipy.stats import variation
 from skimage.filters import threshold_mean #, threshold_otsu
@@ -165,10 +166,12 @@ def foreground_separation(img_thre,disksizes,areasizes):
 
 
 def uniformity_CV(loc, channels):
+	#print('in uniformity_cv')
 	CV = []
 	n = len(channels)
 	for i in range(n):
 		channel = channels[i]
+		#print(np.mean(channel))
 		if np.mean(channel) == 0:
 			print(f"Channel {i} has undefined CV for foreground outside cells")
 			CV.append(np.nan)
@@ -510,8 +513,8 @@ def get_physical_dimension_func(
         unit registry associated with these dimensions, with a 'cell' unit
         added to the defaults
         """
-		reg = UnitRegistry()
-		reg.define("cell = []")
+		#reg = UnitRegistry()
+		#reg.define("cell = []")
 
 		# aicsimageio parses the OME-XML metadata when loading an image,
 		# and uses that metadata to populate various data structures in
@@ -630,6 +633,7 @@ def get_matched_masks(cell_mask, nuclear_mask):
 	nucleus_matched_list = []
 	
 	repaired_num = 0
+	skipped_list = []
 	for i in range(len(cell_coords)):
 		if len(cell_coords[i]) != 0:
 			current_cell_coords = cell_coords[i]
@@ -657,8 +661,10 @@ def get_matched_masks(cell_mask, nuclear_mask):
 				cell_matched_index_list.append(i_ind)
 				nucleus_matched_index_list.append(j_ind)
 			else:
-				print('Skipped cell#'+str(i))
+				skipped_list.append(i)
 
+	if len(skipped_list)>0:
+		print(f"Skipped cells: {skipped_list}")
 	if repaired_num>0:
 		print(str(repaired_num)+' cells repaired out of '+str(len(cell_coords)))
 

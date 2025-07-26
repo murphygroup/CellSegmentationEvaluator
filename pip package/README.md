@@ -2,7 +2,7 @@
 # Cell Segmentation Evaluator: evaluation of cell segmentation methods without reference segmentations
 Haoran Chen and Robert F. Murphy and Ted Zhang\
 Carnegie Mellon University\
-V1.5.16 May 3, 2025
+V1.5.19 July 26, 2025
 
 ## Cell segmentation evaluation approach
 This package implements an approach for cell segmentation evaluation (CSE) that does not rely upon comparison to annotations from humans. For this, we defined a series of segmentation quality metrics that can be applied to multichannel images. The metrics are designed mainly for tissue images assuming that (1) there are multiple channels, and (2) there are multiple cell types that are expected to differ in their expression values for the channels. We calculated these metrics for 11 previously-described segmentation methods applied to 2D images from 4 multiplexed microscope modalities covering 5 tissues. Using principal component analysis to combine the metrics, we defined an overall cell segmentation quality score. The individual metrics and the quality score are returned.
@@ -19,9 +19,11 @@ from CellSegmentationEvaluator import single_method_eval, single_method_eval3D, 
 
 There are three main functions to evaluate an image and associated masks.  For providing inputs as AICSImage object (see https://github.com/AllenCellModeling/aicsimageio and https://pypi.org/project/aicsimageio/), use 
 ```bash
-single_method_eval(imgpath, maskpath) #for 2D
-single_method_eval3D(imgpath, maskpath) #for 3D
+single_method_eval(imgpath, maskpath, PCA_model, output_dir, bz, unit, pixelsizex, pixelsizey) #for 2D
+single_method_eval3D(imgpath, maskpath, PCA_model, output_dir, unit, pixelsizex, pixelsizey) #for 3D
 ```
+where PCAmodel defaults to "2Dv1.5" or "3Dv1.6", bz and unit are ignored, and **the pixel sizes are in micrometers and must be provided if not present in the OME-TIFF metadata**.
+
 Or for providing 3D images and masks as nd-arrays, use
 ```bash
 CSE3D(img, mask, [PCAmodel], [threshimage], [voxel_size])

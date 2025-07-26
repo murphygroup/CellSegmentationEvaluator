@@ -40,6 +40,8 @@ Version: 1.5.14 April 3, 2025 R.F.Murphy
         correct uniformity_CV to handle channels means of 0
 Version: 1.5.16 May 3, 2025 R.F.Murphy
         comment out pint import
+Version: 1.5.17 May 23, 2025 R.F.Murphy
+        rewrite get_voxel_volume and get_pixel_area
 """
 
 schema_url_pattern = re.compile(r"\{(.+)\}OME")
@@ -497,75 +499,23 @@ def get_quality_score(features, model):
 	return score
 
 
-def get_physical_dimension_func(
-		dimensions: int,
-) -> Callable[[AICSImage], Quantity]:
-#) -> Callable[[AICSImage], Tuple[UnitRegistry, Quantity]]:
-#	dimension_names = "XYZ"
-
-
-	#def physical_dimension_func(img: AICSImage) -> Tuple[UnitRegistry, Quantity]:
-	def physical_dimension_func(img: AICSImage) -> Quantity:
-		"""
-        Returns area of each pixel (if dimensions == 2) or volume of each
-        voxel (if dimensions == 3) as a pint.Quantity. Also returns the
-        unit registry associated with these dimensions, with a 'cell' unit
-        added to the defaults
-        """
-		reg = UnitRegistry()
-		reg.define("cell = []")
-
-		# aicsimageio parses the OME-XML metadata when loading an image,
-		# and uses that metadata to populate various data structures in
-		# the AICSImage object. The AICSImage.metadata.to_xml() function
-		# constructs a new OME-XML string from that metadata, so anything
-		# ignored by aicsimageio won't be present in that XML document.
-		# Unfortunately, current aicsimageio ignores physical size units,
-		# so we have to parse the original XML ourselves:
-		
-		# Read OME-TIFF metadata
-		#with tifffile.TiffFile(file_path) as tif:
-		#	metadata = tif.ome_metadata
-		# Parse the XML metadata
-		#root = ET.fromstring(metadata)
-		#physize = np.zeros(3)
-		#phyunit = np.zeros(3)
-		#for elem in root.iter():
-		#	if 'PhysicalSizeX' in elem.attrib:
-		#		physize[0] = elem.get('PhysicalSizeX')
-		#	if 'PhysicalSizeY' in elem.attrib:
-		#		physize[1] = elem.get('PhysicalSizeY')
-		#	if 'PhysicalSizeZ' in elem.attrib:
-		#		physize[2] = elem.get('PhysicalSizeZ')
-		#	if 'PhysicalSizeXUnit' in elem.attrib:
-		#		phyunit[0] = elem.get('PhysicalSizeXUnit')
-		#	if 'PhysicalSizeYUnit' in elem.attrib:
-		#		phyunit[1] = elem.get('PhysicalSizeYUnit')
-		#	if 'PhysicalSizeZUnit' in elem.attrib:
-		#		phyunit[2] = elem.get('PhysicalSizeZUnit')
-
+def get_physical_dimension_func(img,dimensions):
 		physize=img.physical_pixel_sizes
-		#breakpoint()
 
+		print(physize)
 		print('Assuming OME pixel sizes are in microns...')
-		#sizes: List[Quantity] = []
 		sizes = []
 		for idim in range(dimensions):
-		#	unit = reg[phyunit[idim]]
-		#	unit = reg["um"]
-		#	sizes.append(physize[idim] * unit)
 			sizes.append(physize[idim])
 
-		#size: Quantity = math.prod(sizes)
 		size = math.prod(sizes)
-		print(f"inside physical_dimension_func {size}")
-		#return reg, size
 		return size
 
-	return physical_dimension_func
+def get_voxel_volume(img):
+        return get_physical_dimension_func(img,3)
 
-get_voxel_volume = get_physical_dimension_func(3)
-get_pixel_area = get_physical_dimension_func(2)
+def get_pixel_area(img):
+        return get_physical_dimension_func(img,2)
 
 def get_indexed_mask(mask, boundary):
 	boundary = boundary * 1

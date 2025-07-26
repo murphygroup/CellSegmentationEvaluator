@@ -9,7 +9,7 @@ import numpy as np
 import xmltodict
 #import pandas as pd
 #from PIL import Image
-from pint import Quantity, UnitRegistry
+#from pint import Quantity, UnitRegistry
 #from scipy.sparse import csr_matrix
 #from scipy.stats import variation
 #from skimage.filters import threshold_mean, threshold_otsu
@@ -21,7 +21,9 @@ from pint import Quantity, UnitRegistry
 #from sklearn.metrics import silhouette_score
 #from sklearn.preprocessing import StandardScaler
 #import tifffile
-from CellSegmentationEvaluator.functions import cell_size_uniformity, foreground_separation, fraction, foreground_uniformity, cell_type, cell_uniformity, getPCAmodel, get_quality_score, get_matched_masks, thresholding, get_matched_fraction, flatten_dict
+from CellSegmentationEvaluator.functions import get_matched_masks, flatten_dict
+from CellSegmentationEvaluator.functions import cell_size_uniformity, foreground_separation, fraction, foreground_uniformity, cell_type, cell_uniformity, getPCAmodel, get_quality_score, get_matched_masks, thresholding, get_matched_fraction
+#from CellSegmentationEvaluator.functions import *
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -33,29 +35,26 @@ Version: 1.4 December 11, 2023 R.F.Murphy
         repair nuclear masks outside cell masks and mismatched cells and nuclei
          1.5 January 18, 2024 R.F.Murphy
         add CSE3D as simpler function for 3D evaluation
-         1.5.15 April 4, 2025 R.F.Murphy
-        
+         1.5.18 July 24, 2025 R.F.Murphy
+        import get_matched_masks, thresholding
+        improve handling of pixel sizes and remove default values
+        deprecate bz and unit
 """
 
-def single_method_eval(img, mask, PCA_model, output_dir: Path, bz=0, unit='nanometer', pixelsizex=377.5,
-                       pixelsizey=377.5):
-	print("CellSegmentationEvaluator v1.5.15")
+def single_method_eval(img, mask, PCA_model, output_dir: Path, bz=False, unit=False, pixelsizex=False, pixelsizey=False):
 	print("Calculating evaluation metrics v1.5 for", img["name"])
-	# get best z slice for future use
-	bestz = bz
+	if bz:
+		print('bz argument deprecated, it will be ignored')
+	if unit:
+		print('unit argument deprecated, it will be ignored')
+#	if not pixelsizex:
+#		print('required pixelsizex argument missing from single_method_eval, exiting...')
+#		sys.exit()
+#	if not pixelsizex:
+#		print('required pixelsizex argument missing from single_method_eval, exiting...')
+#		sys.exit()
 
-	#print(mask["data"].shape)
-	# get compartment masks
-	#old code
-	#matched_mask = np.squeeze(mask["data"][0, :, bestz, :, :])
-	#print(matched_mask.shape)
-	#cell_matched_mask = matched_mask[0]
-	#nuclear_matched_mask = matched_mask[1]
-	#cell_outside_nucleus_mask = cell_matched_mask - nuclear_matched_mask
-	#print(cell_outside_nucleus_mask.shape)
-	#print(len(np.unique(np.ndarray.flatten(cell_outside_nucleus_mask))))
-	#new code with corrected matching
-	cell_matched_mask, nuclear_matched_mask, cell_outside_nucleus_mask = get_matched_masks(mask["data"][:,0,bestz,:,:],mask["data"][:,1,bestz,:,:])
+	cell_matched_mask, nuclear_matched_mask, cell_outside_nucleus_mask = get_matched_masks(mask["data"][:,0,0,:,:],mask["data"][:,1,0,:,:])
 	#print(cell_matched_mask.shape)
 	cell_matched_mask = np.squeeze(cell_matched_mask)
 	nuclear_matched_mask = np.squeeze(nuclear_matched_mask)
@@ -83,7 +82,7 @@ def single_method_eval(img, mask, PCA_model, output_dir: Path, bz=0, unit='nanom
 		thresholding_channels = range(img["data"].shape[1])
 		seg_channel_provided = False
 		img_thresholded = sum(
-			thresholding(np.squeeze(img["data"][0, c, bestz, :, :]))
+			thresholding(np.squeeze(img["data"][0, c, 0, :, :]))
 			for c in thresholding_channels
 		)
 	if not seg_channel_provided:
@@ -121,26 +120,28 @@ def single_method_eval(img, mask, PCA_model, output_dir: Path, bz=0, unit='nanom
 				]["OriginalMetadata"]["Value"]
 			except:
 				#matched_fraction = 1.0
-				matched_fraction = get_matched_fraction('nonrepaired_matched_mask', np.squeeze(mask["data"][:,0,bestz,:,:]), cell_matched_mask, np.squeeze(mask["data"][:,1,bestz,:,:]))
+				matched_fraction = get_matched_fraction('nonrepaired_matched_mask', np.squeeze(mask["data"][:,0,0,:,:]), cell_matched_mask, np.squeeze(mask["data"][:,1,0,:,:]))
 				#print('Matched fraction='+str(matched_fraction))
-			try:
-				units, pixel_size = get_pixel_area(img["img"])
-			except:
-				reg = UnitRegistry()
-				reg.define("cell = []")
-				units = reg(unit)
-				sizes = [pixelsizex * units, pixelsizey * units]
-				# print(sizes)
-				units = reg
-				# pixel_size = math.prod(sizes)
-				pixel_size = sizes[0] * sizes[1]
+
+			if not pixelsizex or not pixelsizey:
+				try:
+					pixel_size = get_pixel_area(img["img"])
+					print('Pixel size=',pixel_size)
+				except:
+					print('Pixel sizes not specified and cannot be determined from the image metadata')
+					sys.exit()
+			else:
+				pixel_size = pixelsizex * pixelsizey
+                                
 			pixel_num = mask_binary.shape[0] * mask_binary.shape[1]
 			total_area = pixel_size * pixel_num
 			# calculate number of cell per 100 squared micron
-			cell_num = units("cell") * len(np.unique(current_mask)) - 1
+#			cell_num = units("cell") * len(np.unique(current_mask)) - 1
+			cell_num = len(np.unique(current_mask)) - 1
 			cells_per_area = cell_num / total_area
-			units.define("hundred_square_micron = micrometer ** 2 * 100")
-			cell_num_normalized = cells_per_area.to("cell / hundred_square_micron")
+#			units.define("hundred_square_micron = micrometer ** 2 * 100")
+#			cell_num_normalized = cells_per_area.to("cell / hundred_square_micron")
+			cell_num_normalized = cells_per_area*100.
 			# calculate the standard deviation of cell size
 
 			_, _, cell_size_std = cell_size_uniformity(current_mask)
@@ -150,7 +151,7 @@ def single_method_eval(img, mask, PCA_model, output_dir: Path, bz=0, unit='nanom
 				img_binary, mask_binary
 			)
 
-			img_channels = np.squeeze(img["data"][0, :, bestz, :, :])
+			img_channels = np.squeeze(img["data"][0, :, 0, :, :])
 
 			foreground_CV, foreground_PCA = foreground_uniformity(
 				img_binary, mask_binary, img_channels
@@ -158,7 +159,7 @@ def single_method_eval(img, mask, PCA_model, output_dir: Path, bz=0, unit='nanom
 			# background_CV, background_PCA = background_uniformity(img_binary, img_channels)
 			metrics[channel_names[channel]][
 				"NumberOfCellsPer100SquareMicrons"
-			] = cell_num_normalized.magnitude
+			] = cell_num_normalized
 			metrics[channel_names[channel]][
 				"FractionOfForegroundOccupiedByCells"
 			] = foreground_fraction
@@ -182,7 +183,7 @@ def single_method_eval(img, mask, PCA_model, output_dir: Path, bz=0, unit='nanom
 			# get cell type labels
 			cell_type_labels = cell_type(current_mask, img_channels)
 		else:
-			img_channels = np.squeeze(img["data"][0, :, bestz, :, :])
+			img_channels = np.squeeze(img["data"][0, :, 0, :, :])
 			# get cell uniformity
 			cell_CV, cell_fraction, cell_silhouette = cell_uniformity(
 				current_mask, img_channels, cell_type_labels

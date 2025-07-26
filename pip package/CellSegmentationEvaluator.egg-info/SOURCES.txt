@@ -2,7 +2,6 @@ LICENSE
 README.md
 setup.py
 CellSegmentationEvaluator/CSE3D.py
-CellSegmentationEvaluator/CellSegmentationEvaluator.py
 CellSegmentationEvaluator/__init__.py
 CellSegmentationEvaluator/functions.py
 CellSegmentationEvaluator/single_method_eval.py

@@ -13,8 +13,10 @@ Author: Robert F. Murphy and Haoran Chen and Ted Zhang
 Version 1.5.15 R.F.Murphy April 22, 2025
         Allow folder names for images and masks
         save all metrics into a csv file
+        1.5.18 R.F.Murphy June 26, 2025
+        update print statement
 """
-print('CellSegmentationEvaluator (SimpleCSE) v1.5.15')
+print('CellSegmentationEvaluator (SimpleCSE) v1.5.18')
     
 parser = argparse.ArgumentParser(description='image and mask paths')
 parser.add_argument('img_path', type=Path)
@@ -42,14 +44,20 @@ if isdir(img_path):
         print("Image path and mask path must both be folders or both be files.")
         exit()
 elif isfile(img_path):
-    imgs = img_path
+    imgs = {img_path}
+    if not isfile(mask_path):
+        print("Image path and mask path must both be folders or both be files.")
+        exit()
 else:
     print("Invalid image path")
     exit()
 
 for ifile in imgs:
-    # use same filename for both image and mask
-    mfile = join(mask_path, split(ifile)[1])
+    # if folder, use same filename for both image and mask
+    if isdir(img_path):
+        mfile = join(mask_path, split(ifile)[1])
+    else:
+        mfile = mask_path
     seg_metrics = read_and_eval_seg (ifile, mfile, PCA_model, output_directory)
     allmetrics.append(seg_metrics)
 

@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='CellSegmentationEvaluator',
-    version='1.5.15',    
+    version='1.5.19',    
     description='Functions for reference-free evaluation of the quality of cell segmentations',
     long_description=long_description,
     long_description_content_type='text/markdown',

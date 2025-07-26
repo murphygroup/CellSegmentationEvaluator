@@ -7,25 +7,65 @@ from CellSegmentationEvaluator.single_method_eval import single_method_eval
 from CellSegmentationEvaluator.single_method_eval_3D import single_method_eval_3D
 from os.path import split
 #import pickle
+#import xmltodict
+import tifffile
+import xml.etree.ElementTree as ET
+
 
 """
 MAIN FUNCTION TO CALCULATE SEGMENTATION EVALUATION STATISTICS FOR A
 FOR A SINGLE IMAGE AND MASK
 Author: Robert F. Murphy and Haoran Chen and Ted Zhang
 Version: 1.5.14 April 3, 2025
-        juat remove unnecessary imports
+        just remove unnecessary imports
+Version: 1.5.14 April 22, 2025
+        just remove redundant version print statement
+Version: 1.5.18 June 27, 2025
+        use OME-TIFF info to get pixel sizes
+Version:1.5.19 July 26, 2025
+        pass pixel sizes to single_method_eval_3D
 """
-    
+
+def extract_voxel_size_from_tiff(file_path):
+    # Read OME-TIFF metadata
+    with tifffile.TiffFile(file_path) as tif:
+        metadata = tif.ome_metadata
+
+    print(metadata)
+    # Parse the XML metadata
+    root = ET.fromstring(metadata)
+
+    # Initialize sizes
+    physical_size_x = physical_size_y = physical_size_z = None
+
+    # Iterate over all elements to find the first instance with physical sizes
+    for elem in root.iter():
+        if 'PhysicalSizeX' in elem.attrib:
+            physical_size_x = elem.get('PhysicalSizeX')
+        if 'PhysicalSizeY' in elem.attrib:
+            physical_size_y = elem.get('PhysicalSizeY')
+        if 'PhysicalSizeZ' in elem.attrib:
+            physical_size_z = elem.get('PhysicalSizeZ')
+        if physical_size_x and physical_size_y and physical_size_z:
+            break
+
+    return (physical_size_x, physical_size_y, physical_size_z)
+
+
 def read_and_eval_seg(img_path, mask_path, PCA_model, output_directory):
 
-    print('CellSegmentationEvaluator (SimpleCSE) v1.5.12')
     aimg = AICSImage(img_path)
+    physical_size_x, physical_size_y, physical_size_z = aimg.physical_pixel_sizes
+    #print(xmltodict.parse(aimg.metadata.to_xml()))
+    #physical_size_x, physical_size_y, physical_size_z=extract_voxel_size_from_tiff(img_path)
+    #print(physical_size_x, physical_size_y, physical_size_z)
     img = {}
     iheadtail = split(img_path)
     img["path"] = iheadtail[0]
     img["name"] = iheadtail[1]
     img["img"]  = aimg
     img["data"] = aimg.get_image_data()
+    img["pixelsizes"]=(physical_size_x, physical_size_y, physical_size_z)
     #print(img["data"].shape)
 
     amask = AICSImage(mask_path)
@@ -36,35 +76,18 @@ def read_and_eval_seg(img_path, mask_path, PCA_model, output_directory):
     mask["img"] = amask
     mask["data"] = amask.get_image_data()
     #print(mask["data"].shape)
-    # check if the mask is 2D or 3D (could be 3D with only one slice non-zero)
-    bestz = 0
-    # if the mask is 3D, test whether only one slice has cells in it
-    if mask["data"].shape[2] > 1:
-        isum = []
-        for iii in range(0,mask["data"].shape[2]):
-            isum.append(np.sum(mask["data"][0,:,iii,:,:]))
-        #print(isum)
-        bestz = np.nonzero(isum)
-        #print(bestz)
-        # if only one nonzero, reduce mask and img to 2D
-        if isinstance(bestz,int):
-            mask['data'][0, :, iii, :, :] = mask['data'][0, :, bestz, :, :]
-            img['data'][0, :, iii, :, :] = img['data'][0, :, bestz, :, :]
 
-    if isinstance(bestz,int):
-        #if PCA_model==[]:
-        #    try:
-        #        PCA_model = pickle.load(open( "2D_PCA_model.pickle", "rb" ))
-        #    except:
-        #        print('2D PCA model file missing')
-        seg_metrics = single_method_eval(img, mask, PCA_model, output_directory, bz=bestz)
+    if not physical_size_x:
+        print('File missing physical pixel sizes...')
+        physical_size_x = float(input("Enter size of x pixels: "))
+        physical_size_y = float(input("Enter size of y pixels: "))
+
+    if img["data"].shape[2]==1:
+        seg_metrics = single_method_eval(img, mask, PCA_model, output_directory, 0,0,physical_size_x, physical_size_y)
     else:
-        #if PCA_model==[]:
-        #    try:
-        #        PCA_model = pickle.load( open( "3D_PCA_model.pickle", "rb" ))
-        #    except:
-        #        print('3D PCA model file missing')
-        seg_metrics = single_method_eval_3D(img, mask, PCA_model, output_directory)
+        if not physical_size_z:
+            physical_size_z = float(input("Enter size of z pixels: "))
+        seg_metrics = single_method_eval_3D(img, mask, PCA_model, output_directory,'um',physical_size_x,physical_size_y,physical_size_z)
 
     #print(seg_metrics)
 

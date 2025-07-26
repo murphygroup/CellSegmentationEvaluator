@@ -36,6 +36,9 @@ Version: 1.4 December 11, 2023 R.F.Murphy
         add CSE3D as simpler function for 3D evaluation
          1.5.13 April 3, 2025 R.F.Murphy
         remove pint
+         1.5.18 June 26, 2025 R.F.Murphy
+        correct vox_size_unitless to vox_size in call to CSE3D
+        trap bad unit specification
 """
 
 def single_method_eval_3D(img, mask, PCA_model, output_dir: Path, unit='um', pixelsizex=1, pixelsizey=1,
@@ -82,27 +85,23 @@ def single_method_eval_3D(img, mask, PCA_model, output_dir: Path, unit='um', pix
 		img4thresh=0.2
 		print('Using sum of all channels for segmenting image foreground from background')
 	try:
-		units, voxel_size = get_voxel_volume(img["img"])
+		voxel_size = get_voxel_volume(img["img"])
 		#print("get_voxel_volume successful")
 	except:
-		#print("in exception")
-		reg = UnitRegistry()
-		reg.define("cell = []")
-		units = reg(unit)
-		sizes = [pixelsizex * units, pixelsizey * units, pixelsizez * units]
-		#print('pixel sizes=',sizes)
-		units = reg
-		voxel_size = sizes[0] * sizes[1] * sizes[2]
+		voxel_size = pixelsizex*pixelsizey*pixelsizez
+		if (unit=="nanometer" or unit=="nm"):
+			voxel_size = voxel_size/10^9
+		elif not (unit=="micrometer" or unit=="um"):
+			print("Invalid voxel units argument: ",unit)
 
-	vox_size = voxel_size.to("micrometer ** 3")
+	vox_size = voxel_size #in cubic microns
 	#print(vox_size)
-	vox_size_unitless = vox_size.magnitude
 
 	#disksizes = (1, 2, 20, 10) #these were used in CellSegmentationEvaluator v1.4
 	disksizes = (1, 2, 10, 3) #these were used by 3DCellComposer v1.1
 	#areasizes = (20000, 1000) #these were used in CellSegmentationEvaluator v1.4
 	#areasizes = (5000, 1000) #these were used by 3DCellComposer v1.1
-	areasizes = (np.round(20000/vox_size_unitless), np.round(1000/vox_size_unitless)) #20000 is approximately 5 cell volumes (cubic microns)
+	areasizes = (np.round(20000/vox_size), np.round(1000/vox_size)) #20000 is approximately 5 cell volumes (cubic microns)
 
-	metrics = CSE3D(np.squeeze(img["data"]),metric_mask,PCA_model,img4thresh,vox_size_unitless,disksizes,areasizes)
+	metrics = CSE3D(np.squeeze(img["data"]),metric_mask,PCA_model,img4thresh,vox_size,disksizes,areasizes)
 	return metrics

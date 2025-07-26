@@ -35,6 +35,8 @@ Version: 1.4 December 11, 2023 R.F.Murphy
         repair nuclear masks outside cell masks and mismatched cells and nuclei
          1.5 January 18, 2024 R.F.Murphy
         add CSE3D as simpler function for 3D evaluation
+         1.5.18 June 26, 2024 R.F.Murphy
+        print image and mask dimensions
 """
 
 def CSE3D(img_channels, metric_mask, PCA_model, img4thresh=0.2, voxel_size=1.0, disksizes=[1,2,10,3],areasizes="none"):
@@ -47,6 +49,8 @@ def CSE3D(img_channels, metric_mask, PCA_model, img4thresh=0.2, voxel_size=1.0, 
 	# disksizes and areasizes are used for foreground thresholding
 
 	print("CSE3D v1.5")
+	print('Image dimensions',img_channels.shape) 
+	print('Mask dimensions',metric_mask.shape) 
 	print('Voxel size is ',voxel_size,' cubic micrometers')
 	print('Using foreground identification disk filters of sizes ',disksizes)
 
@@ -112,7 +116,10 @@ def CSE3D(img_channels, metric_mask, PCA_model, img4thresh=0.2, voxel_size=1.0, 
 
 			# calculate cell size metrics
 			cell_sizes_microns = [size * voxel_size for size in cell_sizes_voxels]
-			weighted_avg_microns = sum(size * size for size in cell_sizes_microns) / sum(cell_sizes_microns)
+			if sum(cell_sizes_microns) > 0:
+				weighted_avg_microns = sum(size * size for size in cell_sizes_microns) / sum(cell_sizes_microns)
+			else:
+				weighted_avg_microns = 0
 			metrics[channel_names[channel]][
 				"WeightedAvgCellSizeinCubicMicrons"
 			] = weighted_avg_microns
